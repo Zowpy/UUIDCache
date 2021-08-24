@@ -86,7 +86,7 @@ public class UUIDManager {
      * Gets a uuid from mojang api
      *
      * @param name name of the player
-     * @return {@link CompletableFuture<UUID>}
+     * @return {@link UUID}
      */
 
     public UUID getFromMojang(String name) {
