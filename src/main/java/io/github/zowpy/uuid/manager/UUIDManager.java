@@ -5,14 +5,12 @@ import com.google.gson.JsonParser;
 import io.github.zowpy.uuid.UUIDCache;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -103,12 +101,29 @@ public class UUIDManager {
 
             return uuid;
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
 
+    /**
+     * returns if the name contains in redis cache
+     *
+     * @param name name to check
+     * @return {@link CompletableFuture<Boolean>}
+     */
 
+    public CompletableFuture<Boolean> contains(String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            AtomicBoolean contains = new AtomicBoolean(false);
 
+            this.uuidCache.getJedisAPI().getJedisHandler().runCommand(jedis -> {
+                contains.set(jedis.hget("UUIDCache", name) != null);
+            });
+
+            return contains.get();
+        });
     }
 }
+
